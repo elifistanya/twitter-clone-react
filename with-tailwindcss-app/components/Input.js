@@ -6,6 +6,16 @@
   XIcon,
 } from "@heroicons/react/outline";
 import { useRef, useState } from "react";
+import { db, storage } from "../firebase";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "@firebase/firestore";
+import { getDownloadURL, ref, uploadString } from "@firebase/storage";
+import dynamic from "next/dynamic";
 // const Picker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
@@ -17,6 +27,47 @@ function Input() {
   const filePickerRef = useRef(null);
   const [showEmojis, setShowEmojis] = useState(false);
 
+  const sendPost = async () => {
+    if (loading) return;
+    setLoading(true);
+
+   const docRef = await addDoc(collection(db, "posts"), {
+     /* id: session.user.uid,
+      username: session.user.name,
+      userImg: session.user.image,
+      tag: session.user.tag, */
+      text: input,
+      timestamp: serverTimestamp(),
+    }); 
+
+    const imageRef = ref(storage, `posts/${docRef.id}/image`);
+
+    if (selectedFile) {
+      await uploadString(imageRef, selectedFile, "data_url").then(async () => {
+        const downloadURL = await getDownloadURL(imageRef);
+        await updateDoc(doc(db, "posts", docRef.id), {
+          image: downloadURL,
+        });
+      });
+    }
+
+    setLoading(false);
+    setInput("");
+    setSelectedFile(null);
+    setShowEmojis(false);
+  };
+
+  const addImageToPost = (e) => {
+    const reader = new FileReader();
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+
+    reader.onload = (readerEvent) => {
+      setSelectedFile(readerEvent.target.result);
+    };
+  };
+
   const addEmoji = (e) => {
     let sym = e.unified.split("-");
     let codesArray = [];
@@ -24,7 +75,6 @@ function Input() {
     let emoji = String.fromCodePoint(...codesArray);
     setInput(input + emoji);
   };
-
 
   return (
     <div
@@ -56,8 +106,8 @@ function Input() {
                 <XIcon className="text-white h-5" />
               </div>
               <img
-          src="https://raw.githubusercontent.com/elifistanya/MyFirstFlutterApplication/main/images/pp.JPG"
-          alt=""
+                src={selectedFile}
+                alt=""
                 className="rounded-2xl max-h-80 object-contain"
               />
             </div>
@@ -68,12 +118,14 @@ function Input() {
             <div className="flex items-center">
               <div
                 className="icon"
+                onClick={() => filePickerRef.current.click()}
               >
                 <PhotographIcon className="text-[#1d9bf0] h-[22px]" />
                 <input
                   type="file"
                   ref={filePickerRef}
                   hidden
+                  onChange={addImageToPost}
                 />
               </div>
 
@@ -106,6 +158,7 @@ function Input() {
             <button
               className="bg-[#1d9bf0] text-white rounded-full px-4 py-1.5 font-bold shadow-md hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 disabled:cursor-default"
               disabled={!input && !selectedFile}
+              onClick={sendPost}
             >
               Tweet
             </button>
