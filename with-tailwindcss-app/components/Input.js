@@ -15,12 +15,14 @@ import {
   updateDoc,
 } from "@firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "@firebase/storage";
+import { signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 // const Picker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 
 function Input() {
+  const { data: session } = useSession();
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -31,14 +33,14 @@ function Input() {
     if (loading) return;
     setLoading(true);
 
-   const docRef = await addDoc(collection(db, "posts"), {
-     /* id: session.user.uid,
+    const docRef = await addDoc(collection(db, "posts"), {
+      id: session.user.uid,
       username: session.user.name,
       userImg: session.user.image,
-      tag: session.user.tag, */
+      tag: session.user.tag,
       text: input,
       timestamp: serverTimestamp(),
-    }); 
+    });
 
     const imageRef = ref(storage, `posts/${docRef.id}/image`);
 
@@ -83,9 +85,10 @@ function Input() {
       }`}
     >
       <img
-          src="https://raw.githubusercontent.com/elifistanya/MyFirstFlutterApplication/main/images/pp.JPG"
-          alt=""
+        src={session.user.image}
+        alt=""
         className="h-11 w-11 rounded-full cursor-pointer"
+        onClick={signOut}
       />
       <div className="divide-y divide-gray-700 w-full">
         <div className={`${selectedFile && "pb-7"} ${input && "space-y-2.5"}`}>
