@@ -20,6 +20,8 @@ import {
 } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
 import Moment from "react-moment";
+import { Picker } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
 
 function Modal() {
   const { data: session } = useSession();
@@ -28,7 +30,9 @@ function Modal() {
   const [post, setPost] = useState();
   const [comment, setComment] = useState("");
   const router = useRouter();
-
+  const [showEmojis, setShowEmojis] = useState(false);
+  
+  
   useEffect(
     () =>
       onSnapshot(doc(db, "posts", postId), (snapshot) => {
@@ -36,6 +40,15 @@ function Modal() {
       }),
     [db]
   );
+
+  const addEmoji = (e) => {
+    let sym = e.unified.split("-");
+    let codesArray = [];
+    sym.forEach((el) => codesArray.push("0x" + el));
+    let emoji = String.fromCodePoint(...codesArray);
+    setInput(input + emoji);
+  };
+  
 
   const sendComment = async (e) => {
     e.preventDefault();
@@ -141,13 +154,25 @@ function Modal() {
                             <ChartBarIcon className="text-[#1d9bf0] h-[22px]" />
                           </div>
 
-                          <div className="icon">
-                            <EmojiHappyIcon className="text-[#1d9bf0] h-[22px]" />
-                          </div>
-
+                          <div className="icon" onClick={() => setShowEmojis(!showEmojis)}>
+                <EmojiHappyIcon className="text-[#1d9bf0] h-[22px]" />
+              </div>
                           <div className="icon">
                             <CalendarIcon className="text-[#1d9bf0] h-[22px]" />
                           </div>
+                          {showEmojis && (
+                <Picker
+                  onSelect={addEmoji}
+                  style={{
+                    position: "absolute",
+                    marginTop: "465px",
+                    marginLeft: -40,
+                    maxWidth: "320px",
+                    borderRadius: "20px",
+                  }}
+                  theme="dark"
+                />
+              )}
                         </div>
                         <button
                           className="bg-[#1d9bf0] text-white rounded-full px-4 py-1.5 font-bold shadow-md hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 disabled:cursor-default"

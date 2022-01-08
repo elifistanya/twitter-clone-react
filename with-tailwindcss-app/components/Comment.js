@@ -1,4 +1,4 @@
-﻿/* import {
+﻿ import {
     ChartBarIcon,
     ChatIcon,
     DotsHorizontalIcon,
@@ -6,7 +6,8 @@
     ShareIcon,
   } from "@heroicons/react/outline";
   import Moment from "react-moment";
-  
+
+
   function Comment({ comment }) {
     return (
       <div className="p-3 flex cursor-pointer border-b border-gray-700">
@@ -30,7 +31,7 @@
               <span className="hover:underline text-sm sm:text-[15px]">
                 <Moment fromNow>{comment?.timestamp?.toDate()}</Moment>
               </span>
-              <p className="text-[#d9d9d9] mt-0.5 max-w-lg overflow-scroll text-[15px] sm:text-base">
+              <p className="text-[#d9d9d9] mt-0.5 max-w-lg text-[15px] sm:text-base">
                 {comment?.comment}
               </p>
             </div>
@@ -63,4 +64,4 @@
     );
   }
   
-  export default Comment; */
+  export default Comment; 
