@@ -8,7 +8,7 @@ import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyAM82Frz1728mFV0YafWuHaJJYGZwin_uE",
+    apiKey: "",
     authDomain: "twitter-clone-yt-c93e8.firebaseapp.com",
     projectId: "twitter-clone-yt-c93e8",
     storageBucket: "twitter-clone-yt-c93e8.appspot.com",
